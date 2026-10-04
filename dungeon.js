@@ -30,7 +30,9 @@
   // room, the seventh (the south room) the Sneak room, and the eighth the Zero room. The west
   // and east sides are split in two: below Snake is the Bomberman room (m), below Climb the
   // Block Breaker room (r). Doors are a single tile wide and not every pair of neighbours
-  // shares one, but every room can be reached.
+  // shares one, but every room can be reached. Under the Sneak room, behind one tile of its
+  // south wall that a punch can break (%), is a small secret room (s) with a ball in it; it
+  // is drawn as rock until the wall is broken.
   const LAYOUT = [
     '#################################',
     '#111111111#22222222222#333333333#',
@@ -58,6 +60,9 @@
     '#666666666+77777777777+888888888#',
     '#666666666#77777777777#888888888#',
     '#666666666#77777777777#888888888#',
+    '#################%###############',
+    '##############sssss##############',
+    '##############sssss##############',
     '#################################',
   ];
 
@@ -100,12 +105,16 @@
   const FIELD = 23;
   const ARENA = 24; // the boss room's flagstones
   const LEGEND = 25; // a flagstone with a legendary monster on it
-  const SOLID = new Set([WALL, POT, WATER, ISLAND, BRIDGE_H, BRIDGE_V, ARCADE, COMPUTER, DESK, BOOK, CHAIR, SHELF, PLANT, JUKEBOX, LOCKED, LEGEND]);
+  const BREAKABLE = 26; // the wall tile a punch can break
+  const SECRET = 27; // the secret room's floor, rock until the wall is broken
+  const BALL = 28; // the secret room's floor with the ball on it
+  const SOLID = new Set([WALL, POT, WATER, ISLAND, BRIDGE_H, BRIDGE_V, ARCADE, COMPUTER, DESK, BOOK, CHAIR, SHELF, PLANT, JUKEBOX, LOCKED, LEGEND, BREAKABLE, BALL]);
 
   // Room floors by letter; each game room's name is painted on its floor at `at` (tiles).
   const ROOMS = {
     l: { name: 'Lobby', label: 'LOBBY', at: [12.5, 16.5] },
     k: { name: 'Boss room' }, // sealed; the legendaries' battlefield
+    s: { name: 'Secret room' }, // under the Sneak room, behind the breakable wall
     p: { name: 'Pong room', label: 'PONG', at: [7, 6.5] },
     b: { name: 'Balatro room', label: 'BALATRO', at: [22, 6.5] },
     t: { name: 'Tetris room', label: 'TETRIS', at: [8, 20.5] },
@@ -222,6 +231,13 @@
     'Hope you enjoy my childhood video games. More about me at havi.fit.',
   ];
 
+  // A poem on the bookshelf beside the stairs, the one hint to the boss room: it
+  // is read like the book, but no marker gives it away (see `hidden` on THINGS).
+  const POEM = [
+    'Two titans burn where none may tread, / the golden and the dark; / no hero\u2019s hand, no hundred friends / can leave on them a mark.',
+    'But sing the one to slumber deep / and claim it while it dreams: / the other falls to its own kind, / and only to its beams.',
+  ];
+
   // The locked door's page counts the monsters still to find; the unlocked one is read once, as it opens.
   const lockedPages = () => {
     const api = mons();
@@ -231,10 +247,17 @@
   };
   const OPENED_PAGES = ['The lock falls open. Every monster in the Monsterdex is yours, and the two legendary monsters fight on just inside.'];
 
-  // Things the player can face and press Z at.
+  // Things the player can face and press Z at. Each gets a marker on the map, except
+  // one marked `hidden`, which is found only by trying it.
   const THINGS = [
     { x: 13, y: 9, tile: COMPUTER, name: 'PC', pc: true }, // the monsters not with the player
     { x: 12, y: 13, tile: BOOK, name: 'Guide', pages: GUIDE },
+    { x: 10, y: 9, tile: SHELF, name: 'Bookshelf', pages: POEM, hidden: true },
+    // The Sneak room's south wall has one tile a punch can break, and the secret room behind
+    // it holds a ball. Neither is marked: the wall is found by trying it, the ball once the
+    // wall is down (see `revealSecret`).
+    { x: 17, y: 26, tile: BREAKABLE, name: 'Wall', wall: true, hidden: true },
+    { x: 17, y: 28, tile: BALL, name: 'Ball', ball: true, hidden: true },
     { x: 14, y: 17, tile: JUKEBOX, name: 'Jukebox', juke: true },
     { x: 6, y: 5, tile: ARCADE, name: 'Pong', game: '[data-pong]' },
     { x: 4, y: 1, tile: ARCADE, name: 'Flappy', game: '[data-flappy]' },
@@ -255,7 +278,8 @@
     ...LEGENDS.map((l) => ({ x: l.x, y: l.y, tile: LEGEND, name: l.name, legend: l })),
   ];
 
-  const grid = LAYOUT.map((row) => [...row].map((ch) => (ch === '#' ? WALL : ch === 'x' ? LOCKED : FLOOR)));
+  const grid = LAYOUT.map((row) => [...row].map((ch) => (ch === '#' ? WALL : ch === 'x' ? LOCKED : ch === '%' ? BREAKABLE : ch === 's' ? SECRET : FLOOR)));
+  let revealed = false; // whether the secret room is open: until then it is drawn as rock
   const put = (type, cells) => cells.forEach(([x, y]) => { grid[y][x] = type; });
   const rect = (x0, y0, w, h) => {
     const cells = [];
@@ -299,11 +323,12 @@
 
   // Walls show their bricks where they face a room; rock further in stays dark,
   // so the shapes of the rooms stand out.
+  const secretTile = (t) => t === SECRET || t === BALL;
   const facesRoom = (x, y) => {
     for (let dy = -1; dy <= 1; dy++) {
       for (let dx = -1; dx <= 1; dx++) {
         const t = grid[y + dy]?.[x + dx];
-        if (t !== undefined && t !== WALL) return true;
+        if (t !== undefined && t !== WALL && t !== BREAKABLE && !(secretTile(t) && !revealed)) return true;
       }
     }
     return false;
@@ -351,6 +376,32 @@
       c.fillStyle = '#2b2634';
       c.fillRect(px + 4 + (x % 3) * 3, py + 5 + (y % 2) * 4, 2, 1);
     }
+  };
+
+  // The ball, 8 x 8: red above, cream below, a dark band between with its button.
+  const ball = (c, px, py) => {
+    c.fillStyle = 'rgba(0, 0, 0, .22)';
+    c.fillRect(px, py + 7, 8, 2);
+    c.fillStyle = '#2b1a08';
+    c.fillRect(px + 2, py, 4, 1);
+    c.fillRect(px + 1, py + 1, 1, 1);
+    c.fillRect(px + 6, py + 1, 1, 1);
+    c.fillRect(px, py + 2, 1, 4);
+    c.fillRect(px + 7, py + 2, 1, 4);
+    c.fillRect(px + 1, py + 6, 1, 1);
+    c.fillRect(px + 6, py + 6, 1, 1);
+    c.fillRect(px + 2, py + 7, 4, 1);
+    c.fillStyle = '#d9745a';
+    c.fillRect(px + 2, py + 1, 4, 1);
+    c.fillRect(px + 1, py + 2, 6, 1);
+    c.fillStyle = '#fff2e1';
+    c.fillRect(px + 1, py + 4, 6, 2);
+    c.fillRect(px + 2, py + 6, 4, 1);
+    c.fillRect(px + 2, py + 1, 1, 1); // a glint
+    c.fillStyle = '#2b1a08';
+    c.fillRect(px + 1, py + 3, 6, 1);
+    c.fillStyle = '#fffaf2';
+    c.fillRect(px + 3, py + 3, 2, 1);
   };
 
   const water = (c, px, py, x, y) => {
@@ -631,6 +682,31 @@
     },
     [ARENA]: arena,
     [LEGEND]: arena,
+    [BREAKABLE]: (c, px, py, x, y) => { // a wall like any other, but split by a jagged crack
+      wall(c, px, py, x, y);
+      const dark = (dx, dy, w, h) => { c.fillStyle = '#1c1006'; c.fillRect(px + dx, py + dy, w, h); };
+      const chip = (dx, dy, w, h) => { c.fillStyle = '#8b5a2b'; c.fillRect(px + dx, py + dy, w, h); };
+      // the fissure, top to bottom, with light chipped edges beside it
+      dark(6, 0, 2, 3); chip(8, 1, 1, 2);
+      dark(7, 3, 2, 2); chip(6, 3, 1, 1);
+      dark(8, 5, 3, 2); chip(7, 6, 1, 1); chip(11, 5, 1, 1);
+      dark(9, 7, 2, 2); dark(5, 8, 4, 1); chip(4, 8, 1, 1);
+      dark(8, 9, 2, 2); chip(10, 10, 1, 1);
+      dark(7, 11, 2, 3); chip(9, 12, 1, 1);
+      dark(6, 14, 3, 2); dark(10, 13, 2, 1);
+      // a branch off to the right, and bricks missing their corners
+      dark(10, 6, 3, 1); dark(13, 5, 1, 2);
+      dark(1, 1, 1, 1); dark(14, 10, 1, 1); dark(2, 14, 2, 1);
+    },
+    [SECRET]: (c, px, py, x, y) => (revealed ? floor(c, px, py, x, y) : rock(c, px, py, x, y)),
+    [BALL]: (c, px, py, x, y) => {
+      if (!revealed) {
+        rock(c, px, py, x, y);
+        return;
+      }
+      floor(c, px, py, x, y);
+      ball(c, px + 4, py + 4);
+    },
     [STAIRS]: (c, px, py) => {
       c.fillStyle = '#1c1006';
       c.fillRect(px, py, TILE, TILE);
@@ -1461,6 +1537,49 @@
     mctx.restore();
   }
 
+  // The secret room under the Sneak room. `revealSecret` opens it: the broken
+  // wall becomes floor strewn with rubble, the room's tiles are painted as they
+  // are, the walls round it show their bricks, and the ball gets its marker.
+  // `takeBall` lifts the ball off its tile. Both are remembered among the
+  // things found (monsters.js `items`), so they hold from one visit to the next.
+  const SECRET_AT = [13, 25, 9, 5]; // the part of the map to repaint: x, y, w, h in tiles
+  const removeThing = (thing) => {
+    const i = THINGS.indexOf(thing);
+    if (i >= 0) THINGS.splice(i, 1);
+  };
+  const repaintSecret = () => {
+    const [sx, sy, sw, sh] = SECRET_AT;
+    for (let y = sy; y < sy + sh; y++) for (let x = sx; x < sx + sw; x++) TILES[grid[y][x]](mctx, x * TILE, y * TILE, x, y);
+  };
+  const revealSecret = () => {
+    if (revealed) return;
+    revealed = true;
+    const wallThing = THINGS.find((th) => th.wall);
+    if (wallThing) {
+      grid[wallThing.y][wallThing.x] = FLOOR;
+      removeThing(wallThing);
+    }
+    repaintSecret();
+    if (wallThing) { // rubble where the wall stood
+      const px = wallThing.x * TILE;
+      const py = wallThing.y * TILE;
+      mctx.fillStyle = '#4b2e0f';
+      [[2, 3, 3, 2], [9, 2, 2, 2], [5, 8, 2, 2], [11, 10, 3, 2], [1, 12, 2, 1]].forEach(([dx, dy, w, h]) => mctx.fillRect(px + dx, py + dy, w, h));
+      mctx.fillStyle = '#2b1a08';
+      [[3, 5], [10, 4], [6, 10], [12, 12]].forEach(([dx, dy]) => mctx.fillRect(px + dx, py + dy, 1, 1));
+    }
+    const ballThing = THINGS.find((th) => th.ball);
+    if (ballThing) ballThing.hidden = false;
+  };
+  const takeBall = () => {
+    const ballThing = THINGS.find((th) => th.ball);
+    if (!ballThing) return;
+    grid[ballThing.y][ballThing.x] = SECRET;
+    removeThing(ballThing);
+    repaintSecret();
+  };
+  let bagBall = false; // whether the ball is in the bag: it then shows in the top right corner of the view
+
   const PC_AT = [13, 9];
   const newTag = (c, px, py, t) => {
     const x = px + 11;
@@ -1951,6 +2070,7 @@
 
     const near = state === 'playing' ? nearThing() : null;
     THINGS.forEach((thing) => {
+      if (thing.hidden) return;
       const active = thing === near;
       prompt(ctx, thing.x * TILE, thing.y * TILE, active ? Math.floor(t / 400) % 2 : 0, active);
     });
@@ -1959,6 +2079,11 @@
     if (mons()?.fresh().length) newTag(ctx, PC_AT[0] * TILE, PC_AT[1] * TILE, t);
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    if (bagBall) {
+      ctx.fillStyle = 'rgba(20, 12, 4, .55)';
+      ctx.fillRect(VIEW_W - 16, 2, 14, 14);
+      ball(ctx, VIEW_W - 13, 5);
+    }
     if (fade > 0) {
       ctx.fillStyle = `rgba(20, 12, 4, ${fade})`;
       ctx.fillRect(0, 0, VIEW_W, VIEW_H);
@@ -2397,7 +2522,8 @@
   const monsHint = root.querySelector('[data-mons-hint]');
   let monsMode = 'dex'; // dex | mine | pc
   let monsFrom = 'menu'; // menu | pc: where closing the panel goes back to
-  let monsAll = null; // every monster, once the list has loaded
+  let monsAll = null; // every monster, once the list has loaded (fetched straight away: the wall below needs it)
+  window.arcadeMons?.load().then((list) => { monsAll = list; }).catch(() => { /* the Monsterdex tries again */ });
   let monsNote = ''; // what the list says while it has no rows: loading, or why not
   let monsShown = []; // the rows on screen, after the search
   let monsSel = 0;
@@ -2743,7 +2869,39 @@
     else if (thing.juke) openJuke();
     else if (thing.pc) openPC();
     else if (thing.legend) readLegend(thing);
+    else if (thing.wall) punchWall(thing);
+    else if (thing.ball) pickBall(thing);
     else startReading(thing);
+  };
+
+  // Z at the breakable wall: a monster with the hero that knows a punching move
+  // breaks it, and the secret room opens. Without one the wall only sounds hollow,
+  // and if the puncher is in the PC, the page says so.
+  const punchers = () => {
+    const api = mons();
+    const have = new Set(api.owned());
+    return (monsAll || []).filter((m) => have.has(m.id)).map((m) => ({ m, move: m.moves.find((mv) => /punch/i.test(mv.name)) })).filter((p) => p.move);
+  };
+  const punchWall = (thing) => {
+    const api = mons();
+    const party = new Set(api.party());
+    const found = punchers();
+    const here = found.find((p) => party.has(p.m.id));
+    if (here) {
+      api.keep('sneak-wall');
+      revealSecret();
+      startReading({ name: thing.name, pages: [`${here.m.name} used ${here.move.name}! The wall crumbles, and a way opens behind it.`] });
+    } else if (found.length) {
+      startReading({ name: thing.name, pages: [`The wall sounds hollow here. ${found[0].m.name} knows ${found[0].move.name}, but it is waiting in the PC.`] });
+    } else {
+      startReading({ name: thing.name, pages: ['The wall sounds hollow here. Something with a hard punch might break through.'] });
+    }
+  };
+  const pickBall = (thing) => {
+    mons().keep('ball');
+    bagBall = true;
+    takeBall();
+    startReading({ name: thing.name, pages: ['You found the Ball! It goes into your bag, and shows in the corner of the map.'] });
   };
 
   const pause = () => {
@@ -2962,6 +3120,14 @@
   window.addEventListener('blur', pause);
 
   unlockBoss(); // a collection completed before this visit
+  { // the secret room, if it was opened before, and the ball, if it was taken
+    const found = mons()?.items() || [];
+    if (found.includes('sneak-wall')) revealSecret();
+    if (found.includes('ball')) {
+      bagBall = true;
+      takeBall();
+    }
+  }
   refreshPets(); // the ones set to walk fall in behind the hero
   roomOut.textContent = room.name;
   [cam.x, cam.y] = camTarget();

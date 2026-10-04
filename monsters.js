@@ -24,6 +24,7 @@ window.arcadeMons = (() => {
   const PARTY_KEY = 'arcade-party'; // the ids with the player, up to PARTY_MAX, in order
   const NEW_KEY = 'arcade-pc-new'; // ids sent to the PC that the player has not looked at yet
   const WALK_KEY = 'arcade-walk'; // the ids that walk behind the player in the dungeon
+  const ITEMS_KEY = 'arcade-items'; // the things found in the dungeon, by name
   const PARTY_MAX = 6;
 
   // The sheets hold the sprites ten to a row in number order, on an even grid
@@ -246,6 +247,28 @@ window.arcadeMons = (() => {
     return on;
   };
 
+  /* ---------- Things found in the dungeon ---------- */
+
+  // The names of the things the player has found or done in the dungeon, in
+  // order (a secret opened, an item picked up). `keep` adds one, saving to
+  // the cloud as a reward does, and says whether it was new.
+  const items = () => {
+    try {
+      const got = JSON.parse(localStorage.getItem(ITEMS_KEY));
+      if (Array.isArray(got)) return [...new Set(got.filter((s) => typeof s === 'string'))];
+    } catch { /* storage unavailable or junk */ }
+    return [];
+  };
+  const keep = (name) => {
+    const list = items();
+    if (list.includes(name)) return false;
+    list.push(name);
+    try { localStorage.setItem(ITEMS_KEY, JSON.stringify(list)); } catch { /* storage unavailable */ }
+    const acct = window.arcadeAccount;
+    if (acct?.who()) acct.save().catch(() => { /* the Save menu item can retry */ });
+    return true;
+  };
+
   /* ---------- Rewards ---------- */
 
   // The table from rewards.csv, by key: { key, game, mode, achievement, id, name }.
@@ -328,5 +351,5 @@ window.arcadeMons = (() => {
     return got;
   };
 
-  return { STARTER, TOTAL, PARTY_MAX, load, legendary, sprite, walkFrame, legendFrame, legendAvatar, paint, owned, own, no, party, boxed, fresh, seen, withdraw, deposit, walking, toggleWalk, award, earnedBy, rewards: () => loadRewards };
+  return { STARTER, TOTAL, PARTY_MAX, load, legendary, sprite, walkFrame, legendFrame, legendAvatar, paint, owned, own, no, party, boxed, fresh, seen, withdraw, deposit, walking, toggleWalk, items, keep, award, earnedBy, rewards: () => loadRewards };
 })();

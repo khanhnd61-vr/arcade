@@ -28,7 +28,7 @@ service cloud.firestore {
           'sneak-best-normal', 'sneak-best-hard', 'climb-best-normal', 'climb-best-hard',
           'zero-best', 'bomber-best-easy', 'bomber-best-medium', 'bomber-best-hard',
           'breaker-best-normal', 'breaker-best-hard', 'race-best', 'memory-best', 'arcade-mons',
-          'arcade-party', 'arcade-walk'
+          'arcade-party', 'arcade-walk', 'arcade-items'
         ]);
     }
   }

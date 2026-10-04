@@ -30,8 +30,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Every local-storage key the games keep a best in, plus the owned monsters,
-// the party (the ones carried) and the ones that walk behind the player; the
-// last two are choices, so this browser's wins over the cloud's.
+// the party (the ones carried), the ones that walk behind the player and the
+// things found in the dungeon; the party and the walkers are choices, so this
+// browser's win over the cloud's, while monsters and things found are joined.
 // This list is the contract with firestore.rules: a key missing there is
 // rejected on save, so add new games to both.
 const KEYS = [
@@ -40,13 +41,14 @@ const KEYS = [
   'mines-best', 'snake-best-easy', 'snake-best-medium', 'snake-best-hard', 'sneak-best-normal',
   'sneak-best-hard', 'climb-best-normal', 'climb-best-hard', 'zero-best', 'bomber-best-easy',
   'bomber-best-medium', 'bomber-best-hard', 'breaker-best-normal', 'breaker-best-hard', 'race-best',
-  'memory-best', 'arcade-mons', 'arcade-party', 'arcade-walk',
+  'memory-best', 'arcade-mons', 'arcade-party', 'arcade-walk', 'arcade-items',
 ];
 // Keys that hold a JSON map of mode -> milliseconds, where lower is better.
 const TIMES = new Set(['hashi-best', 'mines-best', 'race-best', 'memory-best']);
 const MONS = 'arcade-mons'; // a JSON list of monster numbers
 const PARTY = 'arcade-party'; // a JSON list of up to six of them
 const WALK = 'arcade-walk'; // a JSON list of the ones that walk behind the player
+const ITEMS = 'arcade-items'; // a JSON list of the things found in the dungeon, by name
 
 const read = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const write = (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } };
@@ -65,6 +67,9 @@ const merge = (bests) => {
     if (k === PARTY || k === WALK) continue; // choices, not scores: this browser's stand
     if (k === MONS) {
       const all = [...json(mine, []), ...json(theirs, [])].map(Number).filter((n) => n >= 1);
+      write(k, JSON.stringify([...new Set(all)]));
+    } else if (k === ITEMS) {
+      const all = [...json(mine, []), ...json(theirs, [])].filter((s) => typeof s === 'string');
       write(k, JSON.stringify([...new Set(all)]));
     } else if (TIMES.has(k)) {
       const a = json(mine, {});
