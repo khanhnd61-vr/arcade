@@ -1,0 +1,8 @@
+# OS / editor cruft
+.DS_Store
+*.log
+
+# Never commit Firebase service-account keys or local env files
+*-firebase-adminsdk-*.json
+serviceAccount*.json
+.env*

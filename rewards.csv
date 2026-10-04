@@ -1,0 +1,100 @@
+key,game,mode,achievement,monster_id,monster_name,type
+pong.win,pong,single,Win a game against the computer,50,Pondpop,water
+pong.shutout,pong,single,Win 7-0 against the computer,8,Bubbluga,water
+pong.duo,pong,duo,Finish a two-player game,96,Coralfish,water
+mines.easy,minesweeper,easy,Clear the easy board,38,Ironcub,ground
+mines.medium,minesweeper,medium,Clear the medium board,41,Obsidillo,ground
+mines.hard,minesweeper,hard,Clear the hard board,85,Cragcrab,ground
+mines.hard-fast,minesweeper,hard,Clear the hard board in under 3:00,90,Meteoroll,ground
+hashi.easy,hashi,easy,Solve an easy puzzle,18,Reeftort,water
+hashi.medium,hashi,medium,Solve a medium puzzle,33,Coralisk,water
+hashi.hard,hashi,hard,Solve a hard puzzle,36,Tiderake,water
+memory.easy,memory,easy,Clear the easy board,9,Mysticat,psychic
+memory.medium,memory,medium,Clear the medium board,79,Dreamtort,psychic
+memory.hard,memory,hard,Clear the hard board,53,Moonbot,psychic
+pika.1,pikachu,level 1,Clear level 1 (Still),6,Voltbee,electric
+pika.2,pikachu,level 2,Clear level 2 (Down),16,Octovolt,water
+pika.3,pikachu,level 3,Clear level 3 (Up),66,Goldchick,electric
+pika.4,pikachu,level 4,Clear level 4 (Left),67,Mechabit,electric
+pika.5,pikachu,level 5,Clear level 5 (Right),80,Sunstreak,electric
+pika.6,pikachu,level 6,Clear level 6 (Apart up-down),76,Croakvolt,water
+pika.7,pikachu,level 7,Clear level 7 (Together down-up),28,Starwish,fairy
+pika.8,pikachu,level 8,Clear level 8 (Apart left-right),23,Eyeling,psychic
+pika.9,pikachu,level 9,Clear level 9 (Together right-left),39,Globble,psychic
+pika.10,pikachu,level 10,Clear level 10,24,Wispirit,psychic
+pika.11,pikachu,level 11,Clear level 11,14,Lunacat,psychic
+pika.12,pikachu,level 12,Clear level 12,84,Plumslug,psychic
+pika.13,pikachu,level 13,Clear level 13 (all levels cleared),63,Violetail,psychic
+sneak.normal.1,sneak,normal,Clear level 1 (The hallway),25,Duskitty,psychic
+sneak.normal.2,sneak,normal,Clear level 2 (The vault),81,Dreadbat,psychic
+sneak.normal.3,sneak,normal,Clear level 3 (Crossed paths),26,Shroomlet,grass
+sneak.normal.4,sneak,normal,Clear level 4 (Night shift),20,Rosnail,fairy
+sneak.normal.5,sneak,normal,Clear level 5 (The treasury),68,Charmink,fairy
+sneak.hard.1,sneak,hard,Clear level 1 (The hallway),88,Faefox,fairy
+sneak.hard.2,sneak,hard,Clear level 2 (The vault),42,Petalpix,fairy
+sneak.hard.3,sneak,hard,Clear level 3 (Crossed paths),51,Cottonbaa,fairy
+sneak.hard.4,sneak,hard,Clear level 4 (Night shift),56,Pinkip,fairy
+sneak.hard.5,sneak,hard,Clear level 5 (The treasury),64,Creamcub,fairy
+race.normal.finish,race,normal,Finish the three laps,11,Skyrill,fly
+race.normal.podium,race,normal,Finish on the podium (top 3),44,Blazetail,fire
+race.normal.first,race,normal,Finish first,7,Cindrake,fire
+race.hard.finish,race,hard,Finish the three laps,82,Galeagle,fly
+race.hard.podium,race,hard,Finish on the podium (top 3),72,Ashboar,fire
+race.hard.first,race,hard,Finish first,54,Solflare,fire
+zero.checkpoint,zero,stage,Reach the first checkpoint,58,Lavapup,fire
+zero.gate,zero,stage,Reach the boss gate,31,Pyroyak,fire
+zero.boss,zero,boss,Beat the guard mech,87,Magmawyrm,fire
+zero.perfect,zero,boss,Beat the guard mech without losing a life,100,Infernoid,fire
+balatro.1,balatro,ante 1,Beat ante 1,29,Leafkit,grass
+balatro.2,balatro,ante 2,Beat ante 2,75,Budling,grass
+balatro.3,balatro,ante 3,Beat ante 3,94,Sproutorb,grass
+balatro.4,balatro,ante 4,Beat ante 4,40,Florabbit,grass
+balatro.5,balatro,ante 5,Beat ante 5,43,Verdino,grass
+balatro.6,balatro,ante 6,Beat ante 6,55,Mossaur,grass
+balatro.7,balatro,ante 7,Beat ante 7,17,Amethwing,dragon
+balatro.8,balatro,ante 8,Beat ante 8 (every blind beaten),97,Amethdrake,dragon
+flappy.normal.10,flappy,normal,Pass 10 pipes in one run,99,Cloudrop,water
+flappy.normal.25,flappy,normal,Pass 25 pipes in one run,78,Nimbusprig,ice
+flappy.normal.50,flappy,normal,Pass 50 pipes in one run,30,Emberowl,fire
+flappy.hard.10,flappy,hard,Pass 10 pipes in one run,89,Fernwing,grass
+flappy.hard.25,flappy,hard,Pass 25 pipes in one run,57,Frostwing,ice
+flappy.hard.50,flappy,hard,Pass 50 pipes in one run,21,Puffrost,ice
+climb.normal.50,climb,normal,Climb 50 m in one run,15,Frostbun,ice
+climb.normal.150,climb,normal,Climb 150 m in one run,19,Glacifox,ice
+climb.normal.300,climb,normal,Climb 300 m in one run,27,Iciclehog,ice
+climb.hard.50,climb,hard,Climb 50 m in one run,73,Cryospike,ice
+climb.hard.150,climb,hard,Climb 150 m in one run,86,Glaciercub,ice
+climb.hard.300,climb,hard,Climb 300 m in one run,71,Auroravix,ice
+missiles.normal.20,missiles,normal,Collect 20 stars in one run,4,Emberfen,fire
+missiles.normal.50,missiles,normal,Collect 50 stars in one run,37,Sunfen,fire
+missiles.fast.20,missiles,fast,Collect 20 stars in one run,93,Flamimp,fire
+missiles.fast.50,missiles,fast,Collect 50 stars in one run,62,Redsaur,fire
+missiles.swift,missiles,any,Unlock the Swift (60 stars over all runs),46,Voidflame,fire
+missiles.nimble,missiles,any,Unlock the Nimble (150 stars over all runs),3,Aquarake,water
+breaker.normal.1,breaker,normal,Clear board 1,48,Raccorn,ground
+breaker.normal.4,breaker,normal,Clear board 4,92,Sandvix,ground
+breaker.normal.8,breaker,normal,Clear board 8 (all eight boards once),95,Slatepup,ground
+breaker.hard.1,breaker,hard,Clear board 1,10,Mossgolem,grass
+breaker.hard.4,breaker,hard,Clear board 4,52,Cactibud,grass
+breaker.hard.8,breaker,hard,Clear board 8 (all eight boards once),22,Quillnut,grass
+breaker.perfect,breaker,any,Clear a board without losing a ball,34,Nutmonk,grass
+bomber.easy.3,bomberman,easy,Clear round 3,35,Pebbluin,water
+bomber.easy.6,bomberman,easy,Clear round 6,13,Craburn,water
+bomber.medium.3,bomberman,medium,Clear round 3,65,Inkopus,water
+bomber.medium.6,bomberman,medium,Clear round 6,70,Sharklet,water
+bomber.hard.3,bomberman,hard,Clear round 3,91,Abyssquid,water
+bomber.hard.6,bomberman,hard,Clear round 6,45,Dolphinix,water
+bomber.hard.10,bomberman,hard,Clear round 10,5,Psypus,water
+tetris.lines.10,tetris,single,Clear 10 lines in one game (level 2),32,Snowvix,ice
+tetris.lines.40,tetris,single,Clear 40 lines in one game (level 5),47,Cryokit,ice
+tetris.lines.100,tetris,single,Clear 100 lines in one game (level 11),59,Azurix,ice
+tetris.four,tetris,single,Clear four lines at once (a Tetris),2,Axobloom,water
+tetris.score.10000,tetris,single,Score 10000 points in one game,74,Roslug,fairy
+tetris.duo,tetris,duo,Win a two-player game,61,Bogbug,grass
+snake.easy.20,snake,easy,Eat 20 apples in one run,1,Spriggle,grass
+snake.easy.50,snake,easy,Eat 50 apples in one run,12,Leaflynx,grass
+snake.medium.20,snake,medium,Eat 20 apples in one run,69,Vineserp,grass
+snake.medium.50,snake,medium,Eat 50 apples in one run,77,Mandaroot,grass
+snake.hard.20,snake,hard,Eat 20 apples in one run,83,Bloomcact,grass
+snake.hard.50,snake,hard,Eat 50 apples in one run,60,Fawnaura,grass
+snake.full,snake,any,Fill the whole board with snake,98,Mintfox,grass

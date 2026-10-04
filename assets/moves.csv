@@ -1,0 +1,103 @@
+id,name,move1,move2,move3,move4
+1,Spriggle,Razor Leaf,Giga Drain,Dig,Sunny Day
+2,Axobloom,Surf,BubbleBeam,Mist Ball,Hypnosis
+3,Aquarake,Waterfall,Dragon Claw,Dive,Dragon Dance
+4,Emberfen,Flamethrower,Overheat,Luster Purge,Sunny Day
+5,Psypus,Surf,Psychic,Calm Mind,Future Sight
+6,Voltbee,Thunderbolt,Air Cutter,Charge,Agility
+7,Cindrake,Flamethrower,Fire Blast,Dragon Claw,Dragon Dance
+8,Bubbluga,Surf,BubbleBeam,Water Spout,Rain Dance
+9,Mysticat,Psychic,Luster Purge,Future Sight,Calm Mind
+10,Mossgolem,Earthquake,Giga Drain,Leech Seed,Synthesis
+11,Skyrill,Drill Peck,Dive,Surf,Agility
+12,Leaflynx,Leaf Blade,SolarBeam,Sunny Day,Synthesis
+13,Craburn,Crabhammer,Fire Punch,Flamethrower,Withdraw
+14,Lunacat,Psychic,Hypnosis,Dream Eater,Calm Mind
+15,Frostbun,Blizzard,Mist Ball,Hail,Rest
+16,Octovolt,Thunderbolt,Surf,Octazooka,Thunder Wave
+17,Amethwing,Outrage,Fly,Luster Purge,Dragon Dance
+18,Reeftort,Surf,Giga Drain,Leech Seed,Withdraw
+19,Glacifox,Ice Beam,Extrasensory,Hail,Calm Mind
+20,Rosnail,Earthquake,Mud Shot,Luster Purge,Rain Dance
+21,Puffrost,Ice Beam,Mist Ball,Mist,Haze
+22,Quillnut,Needle Arm,Earthquake,Spikes,Withdraw
+23,Eyeling,Psychic,Psybeam,Hypnosis,Mirror Coat
+24,Wispirit,Psychic,Mist Ball,Calm Mind,Agility
+25,Duskitty,Extrasensory,Psybeam,Kinesis,Agility
+26,Shroomlet,Giga Drain,Spore,Leech Seed,Aromatherapy
+27,Iciclehog,Icicle Spear,Earthquake,Spikes,Hail
+28,Starwish,Psychic,Luster Purge,Future Sight,Cosmic Power
+29,Leafkit,Leaf Blade,Magical Leaf,SolarBeam,Agility
+30,Emberowl,Flamethrower,Air Cutter,Hypnosis,Will-O-Wisp
+31,Pyroyak,Earthquake,Flame Wheel,Heat Wave,Sunny Day
+32,Snowvix,Ice Beam,Aurora Beam,Luster Purge,Hail
+33,Coralisk,Water Pulse,Psychic,Calm Mind,Mirror Coat
+34,Nutmonk,Bullet Seed,Dig,Leech Seed,Amnesia
+35,Pebbluin,Surf,Ice Beam,Ice Ball,Agility
+36,Tiderake,Surf,Outrage,Water Spout,Rain Dance
+37,Sunfen,Heat Wave,Eruption,Sunny Day,Light Screen
+38,Ironcub,Earthquake,Dig,Sand Tomb,Barrier
+39,Globble,Psychic,Mist Ball,Role Play,Barrier
+40,Florabbit,Petal Dance,Giga Drain,Synthesis,Stun Spore
+41,Obsidillo,Earthquake,Flamethrower,Dig,Will-O-Wisp
+42,Petalpix,Magical Leaf,Mist Ball,Aromatherapy,Sleep Powder
+43,Verdino,SolarBeam,DragonBreath,Sunny Day,Synthesis
+44,Blazetail,Flamethrower,Flame Wheel,Fire Spin,Will-O-Wisp
+45,Dolphinix,Surf,Waterfall,Water Pulse,Dive
+46,Voidflame,Flamethrower,Dream Eater,Will-O-Wisp,Hypnosis
+47,Cryokit,Icy Wind,Icicle Spear,Agility,Hail
+48,Raccorn,Dig,Razor Leaf,Mud Shot,Trick
+49,Sparkit,Thunderbolt,Volt Tackle,Thunder Wave,Charge
+50,Pondpop,Thunder,Surf,Rain Dance,Charge
+51,Cottonbaa,Giga Drain,Magical Leaf,Cotton Spore,Rain Dance
+52,Cactibud,Needle Arm,Giga Drain,Leech Seed,Ingrain
+53,Moonbot,Psychic,Earthquake,Calm Mind,Cosmic Power
+54,Solflare,Heat Wave,Fly,Overheat,Sunny Day
+55,Mossaur,Giga Drain,Dragon Claw,Leech Seed,Ingrain
+56,Pinkip,Psybeam,Luster Purge,Calm Mind,Light Screen
+57,Frostwing,Blizzard,Air Cutter,Icy Wind,Hail
+58,Lavapup,Flamethrower,Dig,Eruption,Sunny Day
+59,Azurix,Thunderbolt,Ice Beam,Icicle Spear,Charge
+60,Fawnaura,Giga Drain,Magical Leaf,GrassWhistle,Synthesis
+61,Bogbug,Muddy Water,Giga Drain,Leech Seed,Sleep Powder
+62,Redsaur,Fire Blast,DragonBreath,Sunny Day,Will-O-Wisp
+63,Violetail,Psychic,Extrasensory,Future Sight,Magic Coat
+64,Creamcub,Mist Ball,Calm Mind,Light Screen,Aromatherapy
+65,Inkopus,Octazooka,Psychic,Dive,Kinesis
+66,Goldchick,Spark,Bounce,Charge,Thunder Wave
+67,Mechabit,Thunderbolt,Psychic,Calm Mind,Imprison
+68,Charmink,Extrasensory,Mist Ball,Calm Mind,Reflect
+69,Vineserp,Leaf Blade,Dragon Claw,Dragon Dance,Synthesis
+70,Sharklet,Waterfall,Dive,Whirlpool,Agility
+71,Auroravix,Ice Beam,Psychic,Aurora Beam,Calm Mind
+72,Ashboar,Earthquake,Fire Blast,Will-O-Wisp,Sand-Attack
+73,Cryospike,Icicle Spear,Blizzard,Hail,Rest
+74,Roslug,Earthquake,Mud Shot,Mist Ball,Spikes
+75,Budling,Petal Dance,SolarBeam,Sunny Day,Synthesis
+76,Croakvolt,ThunderPunch,Waterfall,Charge,Thunder Wave
+77,Mandaroot,Giga Drain,Earthquake,Ingrain,Aromatherapy
+78,Nimbusprig,Ice Beam,Mist Ball,Rain Dance,Mist
+79,Dreamtort,Dream Eater,Surf,Hypnosis,Withdraw
+80,Sunstreak,Thunderbolt,Flamethrower,Sunny Day,Charge
+81,Dreadbat,Psychic,Air Cutter,Hypnosis,Dream Eater
+82,Galeagle,Drill Peck,Ice Beam,Sky Attack,Agility
+83,Bloomcact,Needle Arm,Petal Dance,Synthesis,Sunny Day
+84,Plumslug,Psybeam,Mud Shot,Kinesis,Amnesia
+85,Cragcrab,Earthquake,Fire Punch,Sand Tomb,Withdraw
+86,Glaciercub,Ice Punch,Ice Beam,Hail,Mist
+87,Magmawyrm,Outrage,Fire Blast,Eruption,Dragon Dance
+88,Faefox,Extrasensory,Luster Purge,Calm Mind,Agility
+89,Fernwing,Razor Leaf,Air Cutter,SolarBeam,Synthesis
+90,Meteoroll,Earthquake,Flame Wheel,Fire Blast,Cosmic Power
+91,Abyssquid,Hydro Pump,Luster Purge,Dive,Calm Mind
+92,Sandvix,Earthquake,Sand Tomb,Sand-Attack,Mist Ball
+93,Flamimp,Flamethrower,Will-O-Wisp,Mist Ball,Trick
+94,Sproutorb,SolarBeam,Synthesis,Ingrain,Leech Seed
+95,Slatepup,Earthquake,Mud Shot,Spikes,Sand-Attack
+96,Coralfish,Surf,Flamethrower,Agility,Rain Dance
+97,Amethdrake,Psychic,DragonBreath,Calm Mind,Future Sight
+98,Mintfox,Magical Leaf,Giga Drain,Aromatherapy,Synthesis
+99,Cloudrop,Surf,Blizzard,Hail,Mist
+100,Infernoid,Sacred Fire,Flamethrower,Eruption,Sunny Day
+101,Aurelyon,Outrage,Luster Purge,Dragon Dance,Light Screen
+102,Noctyrax,Psycho Boost,Outrage,Dragon Dance,Hypnosis

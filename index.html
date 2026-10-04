@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arcade</title>
+  <meta name="description" content="A pixel dungeon of small browser games: Tetris, Balatro-lite, Hashi, Pong, Pikachu, Flappy Bird, Minesweeper, Snake, Bomberman, Missiles!, Sneak, Climb, Block Breaker, Zero, Race and Memory" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Arcade" />
+  <meta property="og:description" content="A pixel dungeon of small browser games." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/havi-pixel.png" />
+
+  <!-- Icons -->
+  <link rel="icon" href="assets/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="assets/arcade-pixel.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Havilab, top right: the maker's site -->
+  <a class="play__havi" href="https://havi.fit" target="_blank" rel="noopener">Havilab &#8599;</a>
+
+  <!-- The whole page is the arcade: one window at a time, the dungeon or the game the player walked into -->
+  <main class="play" id="play">
+
+    <!-- Dungeon hub (dungeon.js): walk into a room to open its game -->
+    <article class="dungeon" data-dungeon>
+      <div class="bench dungeon__card">
+        <div class="bench__bar">
+          <span class="bench__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="bench__name">dungeon.js</span>
+          <span class="dungeon__room" data-room aria-live="polite">Lobby</span>
+        </div>
+        <div class="dungeon__body">
+          <div class="dungeon__stage" data-stage tabindex="0" aria-label="Dungeon map">
+            <canvas class="dungeon__view" data-view width="400" height="304" aria-hidden="true"></canvas>
+            <div class="tetris__overlay dungeon__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Explore the lobby, then find the sixteen game rooms. One door stays locked.</p>
+                <button class="btn btn--primary" type="button" data-start>Enter the dungeon</button>
+              </div>
+            </div>
+            <!-- RPG-style text box for the computer, the book and the arcades -->
+            <!-- Jukebox panel: the track list from music.js -->
+            <div class="dungeon__talk dungeon__juke" data-juke hidden role="dialog" aria-label="Jukebox">
+              <p class="dungeon__talk-title">Jukebox</p>
+              <ul class="dungeon__juke-list" data-juke-list></ul>
+              <p class="dungeon__talk-hint" data-juke-hint><kbd>&uarr;</kbd><kbd>&darr;</kbd> choose · <kbd>Z</kbd> play · <kbd>X</kbd> close</p>
+            </div>
+            <!-- Player menu (Enter), down the right side of the map: Status, Login and Save -->
+            <div class="dungeon__talk dungeon__menu" data-menu hidden role="dialog" aria-label="Menu">
+              <p class="dungeon__talk-title">Menu</p>
+              <ul class="dungeon__juke-list dungeon__menu-list" data-menu-list></ul>
+              <p class="dungeon__menu-note" data-menu-note hidden></p>
+              <p class="dungeon__talk-hint"><kbd>&uarr;</kbd><kbd>&darr;</kbd> choose · <kbd>Z</kbd> select · <kbd>X</kbd> close</p>
+            </div>
+            <!-- Status screen: the player's progress in every game, filled in by dungeon.js -->
+            <div class="dungeon__talk dungeon__status" data-status hidden role="dialog" aria-label="Status">
+              <p class="dungeon__talk-title">Status · <span data-status-sum></span></p>
+              <ul class="dungeon__status-list" data-status-list></ul>
+              <p class="dungeon__talk-hint"><kbd>X</kbd> back</p>
+            </div>
+            <!-- Monsterdex, My mons and the PC (monsters.js): a list of monsters, and a page for the chosen one -->
+            <div class="dungeon__talk dungeon__status dungeon__mons" data-mons hidden role="dialog" aria-label="Monsters">
+              <p class="dungeon__talk-title" data-mons-title>Monsterdex</p>
+              <input class="dungeon__mons-search" data-mons-search type="search" placeholder="Search by name, number or type" aria-label="Search the Monsterdex" autocomplete="off" spellcheck="false" />
+              <ul class="dungeon__mons-list" data-mons-list></ul>
+              <div class="dungeon__mons-page" data-mons-page hidden></div>
+              <p class="dungeon__talk-hint" data-mons-hint></p>
+            </div>
+            <div class="dungeon__talk" data-talk hidden role="dialog" aria-live="polite">
+              <canvas class="dungeon__talk-pic" data-talk-pic width="32" height="32" hidden aria-hidden="true"></canvas>
+              <p class="dungeon__talk-title" data-talk-title></p>
+              <p class="dungeon__talk-text" data-talk-text></p>
+              <p class="dungeon__talk-hint"><kbd>Z</kbd> <span data-talk-more>next</span> · <kbd>X</kbd> close</p>
+            </div>
+          </div>
+          <!-- Touch controls (shown on touch screens) -->
+          <div class="tetris__pad dungeon__pad">
+            <button type="button" data-dir="up" aria-label="Walk up">↑</button>
+            <button type="button" data-dir="left" aria-label="Walk left">←</button>
+            <button type="button" data-dir="down" aria-label="Walk down">↓</button>
+            <button type="button" data-dir="right" aria-label="Walk right">→</button>
+            <button type="button" class="dungeon__pad-z" data-act="z" aria-label="Interact">Z</button>
+            <button type="button" class="dungeon__pad-x" data-act="x" aria-label="Close">X</button>
+            <button type="button" class="dungeon__pad-menu" data-act="menu" aria-label="Menu">&#9776;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Tetris (tetris.js) -->
+    <article class="tetris" data-tetris hidden>
+      <div class="bench tetris__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">tetris.js</span>
+          <div class="bench__engines tetris__modes" role="group" aria-label="Players">
+            <button class="bench__engine is-active" type="button" data-mode="1" aria-pressed="true">1 player</button>
+            <button class="bench__engine" type="button" data-mode="2" aria-pressed="false">2 players</button>
+          </div>
+        </div>
+        <div class="tetris__body">
+          <div class="tetris__stage" data-stage tabindex="0" aria-label="Tetris">
+            <!-- One player panel; tetris.js clones it for the right player -->
+            <div class="tetris__player" data-player>
+              <div class="tetris__screen">
+                <canvas class="tetris__board" data-board width="280" height="560" aria-hidden="true"></canvas>
+              </div>
+              <div class="tetris__side">
+                <p class="tetris__who" data-who>Left player</p>
+                <div class="bench__stat bench__stat--main">
+                  <span class="bench__label">Score</span>
+                  <span class="bench__value" data-out="score">0</span>
+                </div>
+                <div class="bench__stat" data-solo>
+                  <span class="bench__label">Best</span>
+                  <span class="bench__value" data-out="best">0</span>
+                </div>
+                <div class="bench__stat">
+                  <span class="bench__label">Lines</span>
+                  <span class="bench__value" data-out="lines">0</span>
+                </div>
+                <div class="bench__stat">
+                  <span class="bench__label">Level</span>
+                  <span class="bench__value" data-out="level">1</span>
+                </div>
+                <div class="bench__stat">
+                  <span class="bench__label">Next</span>
+                  <canvas class="tetris__next" data-next width="120" height="60" aria-hidden="true"></canvas>
+                </div>
+                <!-- Key lists: tetris.js keeps the right one in each player's panel -->
+                <div class="bench__stat tetris__keys" data-keys="solo" data-solo>
+                  <span class="bench__label">Keys</span>
+                  <dl>
+                    <div><dt><kbd>←</kbd><kbd>→</kbd></dt><dd>Move</dd></div>
+                    <div><dt><kbd>↑</kbd><kbd>X</kbd></dt><dd>Rotate ↻</dd></div>
+                    <div><dt><kbd>Z</kbd></dt><dd>Rotate ↺</dd></div>
+                    <div><dt><kbd>↓</kbd></dt><dd>Soft drop</dd></div>
+                    <div><dt><kbd>Space</kbd></dt><dd>Hard drop</dd></div>
+                    <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+                  </dl>
+                </div>
+                <div class="bench__stat tetris__keys" data-keys="left" data-duo>
+                  <span class="bench__label">Keys</span>
+                  <dl>
+                    <div><dt><kbd>A</kbd><kbd>D</kbd></dt><dd>Move</dd></div>
+                    <div><dt><kbd>W</kbd></dt><dd>Rotate</dd></div>
+                    <div><dt><kbd>S</kbd></dt><dd>Soft drop</dd></div>
+                    <div><dt><kbd>F</kbd></dt><dd>Hard drop</dd></div>
+                    <div><dt><kbd>Space</kbd></dt><dd>Pause</dd></div>
+                  </dl>
+                </div>
+                <div class="bench__stat tetris__keys" data-keys="right" data-duo>
+                  <span class="bench__label">Keys</span>
+                  <dl>
+                    <div><dt><kbd>←</kbd><kbd>→</kbd></dt><dd>Move</dd></div>
+                    <div><dt><kbd>↑</kbd></dt><dd>Rotate</dd></div>
+                    <div><dt><kbd>↓</kbd></dt><dd>Soft drop</dd></div>
+                    <div><dt><kbd>Enter</kbd></dt><dd>Hard drop</dd></div>
+                    <div><dt><kbd>Space</kbd></dt><dd>Pause</dd></div>
+                  </dl>
+                </div>
+              </div>
+            </div>
+
+            <div class="tetris__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Stack the blocks, clear the lines.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens, 1 player only) -->
+          <div class="tetris__pad">
+            <button type="button" data-act="left" aria-label="Move left">←</button>
+            <button type="button" data-act="rotate" aria-label="Rotate">↻</button>
+            <button type="button" data-act="right" aria-label="Move right">→</button>
+            <button type="button" data-act="down" aria-label="Soft drop">↓</button>
+            <button type="button" data-act="drop" aria-label="Hard drop">⤓</button>
+            <button type="button" data-act="pause" aria-label="Pause">❚❚</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Balatro-lite (balatro.js) -->
+    <article class="balatro" data-balatro hidden>
+      <div class="bench balatro__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">balatro.js</span>
+          <span class="balatro__blind" data-out="blind">Ante 1 · Small Blind</span>
+        </div>
+        <div class="balatro__body">
+          <div class="balatro__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Score</span>
+              <span class="bench__value" data-out="score">0</span>
+              <span class="balatro__target">target <b data-out="target">300</b></span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Hand</span>
+              <span class="bench__value balatro__handname" data-out="handname">-</span>
+              <span class="balatro__formula" data-out="formula">Pick up to 5 cards</span>
+            </div>
+            <div class="balatro__pair">
+              <div class="bench__stat">
+                <span class="bench__label">Hands</span>
+                <span class="bench__value" data-out="hands">4</span>
+              </div>
+              <div class="bench__stat">
+                <span class="bench__label">Discards</span>
+                <span class="bench__value" data-out="discards">3</span>
+              </div>
+            </div>
+            <div class="balatro__pair">
+              <div class="bench__stat">
+                <span class="bench__label">Deck</span>
+                <span class="bench__value" data-out="deck">44</span>
+              </div>
+              <div class="bench__stat">
+                <span class="bench__label">Best</span>
+                <span class="bench__value" data-out="best">-</span>
+              </div>
+            </div>
+            <div class="bench__stat balatro__help">
+              <span class="bench__label">How to play</span>
+              <p>Pick up to five cards and play them as a poker hand. Its chips × mult is added to your score.</p>
+              <p>Reach the target within four hands. Discards swap cards without scoring.</p>
+              <p>After each blind, take a joker. Only the cards that make the hand score, and jokers act on those.</p>
+            </div>
+          </div>
+          <div class="balatro__table">
+            <div class="balatro__jokers" data-jokers aria-label="Jokers"></div>
+            <div class="balatro__stage">
+              <p class="balatro__result" data-result aria-live="polite"></p>
+              <div class="balatro__hand" data-hand role="group" aria-label="Your hand"></div>
+              <div class="balatro__actions">
+                <button class="btn btn--primary" type="button" data-play disabled>Play hand</button>
+                <button class="balatro__discard" type="button" data-discard disabled>Discard</button>
+                <span class="balatro__sort" role="group" aria-label="Sort hand">
+                  <button type="button" data-sort="rank" class="is-active">Rank</button>
+                  <button type="button" data-sort="suit">Suit</button>
+                </span>
+              </div>
+              <div class="tetris__overlay balatro__overlay" data-overlay>
+                <div class="tetris__dialog balatro__dialog">
+                  <p data-msg aria-live="polite">Play poker hands to beat each blind.</p>
+                  <div class="balatro__offer" data-offer hidden></div>
+                  <button class="btn btn--primary" type="button" data-start>Start run</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Hashi (hashi.js) -->
+    <article class="hashi" data-hashi hidden>
+      <div class="bench hashi__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">hashi.js</span>
+          <div class="bench__engines" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-level="easy" aria-pressed="true">Easy</button>
+            <button class="bench__engine" type="button" data-level="medium" aria-pressed="false">Medium</button>
+            <button class="bench__engine" type="button" data-level="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="hashi__body">
+          <div class="hashi__stage">
+            <!-- Filled in by hashi.js -->
+            <svg class="hashi__board" data-board role="img" aria-label="Hashi puzzle"></svg>
+            <div class="hashi__overlay" data-overlay hidden>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Solved!</p>
+                <button class="btn btn--primary" type="button" data-new>New puzzle</button>
+              </div>
+            </div>
+          </div>
+          <div class="hashi__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">0:00</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Done</span>
+              <span class="bench__value" data-out="done">0 / 0</span>
+            </div>
+            <div class="hashi__actions">
+              <button type="button" data-undo>Undo</button>
+              <button type="button" data-restart>Clear</button>
+              <button type="button" data-new>New</button>
+            </div>
+            <div class="bench__stat hashi__help">
+              <span class="bench__label">How to play</span>
+              <p>Join all islands into one group. Each number is how many bridges touch that island.</p>
+              <p>Bridges run straight, never cross, and at most two join a pair.</p>
+              <p>Tap between two islands, or drag from one to the other, to add a bridge. Tap again for a second one, a third time to remove them.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Pong (pong.js): you against the computer, or two players against each other on one keyboard -->
+    <article class="pong" data-pong hidden>
+      <div class="bench pong__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">pong.js</span>
+          <div class="bench__engines tetris__modes" role="group" aria-label="Players">
+            <button class="bench__engine is-active" type="button" data-mode="1" aria-pressed="true">Single</button>
+            <button class="bench__engine" type="button" data-mode="2" aria-pressed="false">Duo</button>
+          </div>
+        </div>
+        <div class="pong__body">
+          <div class="pong__stage" data-stage tabindex="0" aria-label="Pong">
+            <canvas class="pong__court" data-court width="480" height="300" aria-hidden="true"></canvas>
+            <div class="tetris__overlay pong__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">First to 7 wins.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pong__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label" data-out="sides">You : CPU</span>
+              <span class="bench__value" data-out="score">0 : 0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Rally</span>
+              <span class="bench__value" data-out="rally">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best rally</span>
+              <span class="bench__value" data-out="best">0</span>
+            </div>
+            <div class="bench__stat tetris__keys" data-solo>
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>W</kbd><kbd>S</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>↑</kbd><kbd>↓</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>Space</kbd></dt><dd>Pause</dd></div>
+              </dl>
+            </div>
+            <div class="bench__stat tetris__keys" data-duo>
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>W</kbd><kbd>S</kbd></dt><dd>Left player</dd></div>
+                <div><dt><kbd>↑</kbd><kbd>↓</kbd></dt><dd>Right player</dd></div>
+                <div><dt><kbd>Space</kbd></dt><dd>Pause</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens, single only); dragging on the court works too -->
+          <div class="tetris__pad pong__pad">
+            <button type="button" data-act="up" aria-label="Move up">↑</button>
+            <button type="button" data-act="down" aria-label="Move down">↓</button>
+            <button type="button" data-act="pause" aria-label="Pause">❚❚</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Pikachu (pikachu.js): join pairs of matching monsters to clear the board; each level moves the tiles differently -->
+    <article class="pika" data-pika hidden>
+      <div class="bench pika__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">pikachu.js</span>
+          <div class="bench__engines pika__levels" role="group" aria-label="Level">
+            <button class="bench__engine" type="button" data-level-prev aria-label="Previous level">&lsaquo;</button>
+            <span class="pika__levelname" data-out="levelname" aria-live="polite">Level 1 · Still</span>
+            <button class="bench__engine" type="button" data-level-next aria-label="Next level">&rsaquo;</button>
+          </div>
+        </div>
+        <div class="pika__body">
+          <div class="pika__stage" data-stage tabindex="0" aria-label="Pikachu board">
+            <canvas class="pika__board" data-board width="648" height="456" aria-hidden="true"></canvas>
+            <div class="tetris__overlay pika__overlay" data-overlay>
+              <div class="tetris__dialog pika__dialog">
+                <p data-msg aria-live="polite">Join pairs of matching monsters to clear the board.</p>
+                <button class="btn btn--primary" type="button" data-start>Start level</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pika__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Score</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="pika__pair">
+              <div class="bench__stat">
+                <span class="bench__label">Best</span>
+                <span class="bench__value" data-out="best">-</span>
+              </div>
+              <div class="bench__stat">
+                <span class="bench__label">Pairs</span>
+                <span class="bench__value" data-out="pairs">0</span>
+              </div>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Level</span>
+              <span class="bench__value" data-out="level">1 / 13</span>
+              <span class="pika__gravity" data-out="gravity">Still</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">4:00</span>
+              <div class="pika__timebar" data-timebar><i data-time-fill></i></div>
+            </div>
+            <div class="pika__actions">
+              <button type="button" data-hint>Hint (5)</button>
+              <button type="button" data-shuffle>Shuffle (3)</button>
+              <button type="button" data-new>Restart</button>
+            </div>
+            <div class="bench__stat pika__help">
+              <span class="bench__label">How to play</span>
+              <p>Tap two matching monsters to clear them. The line between them bends at most twice and only crosses empty space, the gap around the board included.</p>
+              <p>Clear every pair before the time runs out. Quick matches in a row score a combo.</p>
+              <p>Each level sets a gravity: after a match the other tiles stay put, fall, rise, slide, or split two ways.</p>
+              <p>Arrows and <kbd>Z</kbd> work too; <kbd>H</kbd> hints, <kbd>P</kbd> pauses.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Flappy Bird (flappy.js): flap through the gaps between the pipes -->
+    <article class="flappy" data-flappy hidden>
+      <div class="bench flappy__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">flappy.js</span>
+          <div class="bench__engines flappy__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="normal" aria-pressed="true">Normal</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="flappy__body">
+          <div class="flappy__stage" data-stage tabindex="0" aria-label="Flappy Bird">
+            <canvas class="flappy__sky" data-sky width="320" height="480" aria-hidden="true"></canvas>
+            <div class="tetris__overlay flappy__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Flap through the gaps in the pipes.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flappy__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Score</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Runs</span>
+              <span class="bench__value" data-out="runs">0</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>Space</kbd></dt><dd>Flap</dd></div>
+                <div><dt><kbd>&uarr;</kbd><kbd>W</kbd></dt><dd>Flap</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="flappy__hint">Clicking the sky flaps too.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); tapping the sky works too -->
+          <div class="tetris__pad flappy__pad">
+            <button type="button" data-act="flap" aria-label="Flap">Flap</button>
+            <button type="button" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Minesweeper (minesweeper.js): dig up every cell that hides no mine -->
+    <article class="mines" data-mines hidden>
+      <div class="bench mines__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">minesweeper.js</span>
+          <div class="bench__engines" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-level="easy" aria-pressed="true">Easy</button>
+            <button class="bench__engine" type="button" data-level="medium" aria-pressed="false">Medium</button>
+            <button class="bench__engine" type="button" data-level="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="mines__body">
+          <div class="mines__stage" data-stage tabindex="0" aria-label="Minesweeper board">
+            <div class="mines__scroll">
+              <canvas class="mines__field" data-field width="216" height="216" aria-hidden="true"></canvas>
+            </div>
+            <div class="tetris__overlay mines__overlay" data-overlay hidden>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Cleared!</p>
+                <button class="btn btn--primary" type="button" data-new>Play again</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mines__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Mines left</span>
+              <span class="bench__value" data-out="mines">10</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">0:00</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Cleared</span>
+              <span class="bench__value" data-out="won">0 / 0</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&uarr;</kbd><kbd>&darr;</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>Z</kbd></dt><dd>Dig</dd></div>
+                <div><dt><kbd>X</kbd></dt><dd>Flag</dd></div>
+                <div><dt><kbd>N</kbd></dt><dd>New game</dd></div>
+              </dl>
+            </div>
+            <div class="bench__stat mines__help">
+              <span class="bench__label">How to play</span>
+              <p>A number counts the mines in the eight cells around it. Dig up every cell that has none.</p>
+              <p>Click to dig, right-click to flag, or hold a cell on touch. Click a number whose flags are all placed to dig around it.</p>
+              <p>The first dig is always safe.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens): tap digs, or flags once the mode is switched -->
+          <div class="tetris__pad mines__pad">
+            <button type="button" data-act="mode" aria-pressed="false" aria-label="Tap mode">Dig</button>
+            <button type="button" data-act="new" aria-label="New game">New</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Snake (snake.js): eat the apples, keep away from the walls and your tail -->
+    <article class="snake" data-snake hidden>
+      <div class="bench snake__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">snake.js</span>
+          <div class="bench__engines snake__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="easy" aria-pressed="true">Easy</button>
+            <button class="bench__engine" type="button" data-mode="medium" aria-pressed="false">Medium</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="snake__body">
+          <div class="snake__stage" data-stage tabindex="0" aria-label="Snake">
+            <canvas class="snake__board" data-board width="480" height="320" aria-hidden="true"></canvas>
+            <div class="tetris__overlay snake__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Eat the apples and keep away from your tail.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="snake__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Apples</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Length</span>
+              <span class="bench__value" data-out="length">4</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&uarr;</kbd><kbd>&darr;</kbd></dt><dd>Turn</dd></div>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Turn</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="snake__hint">W A S D work too. Each apple makes the snake longer and faster.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); swiping the board turns too -->
+          <div class="tetris__pad snake__pad">
+            <button type="button" data-dir="up" aria-label="Turn up">&uarr;</button>
+            <button type="button" data-dir="left" aria-label="Turn left">&larr;</button>
+            <button type="button" data-dir="down" aria-label="Turn down">&darr;</button>
+            <button type="button" data-dir="right" aria-label="Turn right">&rarr;</button>
+            <button type="button" class="snake__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Bomberman (bomberman.js): drop bombs to break the bricks and blow up the slimes and imps -->
+    <article class="bomber" data-bomber hidden>
+      <div class="bench bomber__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">bomberman.js</span>
+          <div class="bench__engines bomber__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="easy" aria-pressed="true">Easy</button>
+            <button class="bench__engine" type="button" data-mode="medium" aria-pressed="false">Medium</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="bomber__body">
+          <div class="bomber__stage" data-stage tabindex="0" aria-label="Bomberman">
+            <canvas class="bomber__board" data-board width="480" height="352" aria-hidden="true"></canvas>
+            <div class="tetris__overlay bomber__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Blow up the slimes, and mind your own blasts.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bomber__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Score</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Round</span>
+              <span class="bench__value" data-out="round">1</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Lives</span>
+              <span class="bench__value" data-out="lives">3</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">2:30</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&uarr;</kbd><kbd>&darr;</kbd></dt><dd>Walk</dd></div>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Walk</dd></div>
+                <div><dt><kbd>Z</kbd><kbd>Space</kbd></dt><dd>Bomb</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="bomber__hint">W A S D work too. Bricks may hide an extra bomb, a longer blast or quicker boots.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); tapping the arena drops a bomb too -->
+          <div class="tetris__pad bomber__pad">
+            <button type="button" data-dir="up" aria-label="Walk up">&uarr;</button>
+            <button type="button" data-dir="left" aria-label="Walk left">&larr;</button>
+            <button type="button" data-dir="down" aria-label="Walk down">&darr;</button>
+            <button type="button" data-dir="right" aria-label="Walk right">&rarr;</button>
+            <button type="button" class="bomber__pad-bomb" data-act="bomb" aria-label="Drop a bomb">Bomb</button>
+            <button type="button" class="bomber__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Missiles! (missiles.js): steer the plane, make the missiles chasing it crash into each other -->
+    <article class="missiles" data-missiles hidden>
+      <div class="bench missiles__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">missiles.js</span>
+          <div class="bench__engines missiles__modes" role="group" aria-label="Missile speed">
+            <button class="bench__engine is-active" type="button" data-mode="normal" aria-pressed="true">Normal</button>
+            <button class="bench__engine" type="button" data-mode="fast" aria-pressed="false">Fast</button>
+          </div>
+        </div>
+        <div class="missiles__body">
+          <div class="missiles__stage" data-stage tabindex="0" aria-label="Missiles!">
+            <canvas class="missiles__sky" data-sky width="480" height="360" aria-hidden="true"></canvas>
+            <div class="tetris__overlay missiles__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Steer the plane and let the missiles catch each other.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="missiles__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Stars</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Missiles down</span>
+              <span class="bench__value" data-out="dodged">0</span>
+            </div>
+            <div class="bench__stat missiles__hangar">
+              <span class="bench__label">Hangar &middot; <span data-out="stars">0</span> &#9733;</span>
+              <div class="missiles__planes" role="group" aria-label="Plane">
+                <button type="button" data-plane="baron" aria-pressed="true"><b>Baron</b><span data-blurb>Steady and sure</span></button>
+                <button type="button" data-plane="swift" aria-pressed="false"><b>Swift</b><span data-blurb>Fast, turns wide</span></button>
+                <button type="button" data-plane="nimble" aria-pressed="false"><b>Nimble</b><span data-blurb>Slow, turns tight</span></button>
+              </div>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Steer</dd></div>
+                <div><dt><kbd>A</kbd><kbd>D</kbd></dt><dd>Steer</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="missiles__hint">Or hold the mouse down on the sky. Missiles are faster than you, but you turn tighter.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); dragging on the sky steers too -->
+          <div class="tetris__pad missiles__pad">
+            <button type="button" data-turn="left" aria-label="Turn left">&larr;</button>
+            <button type="button" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+            <button type="button" data-turn="right" aria-label="Turn right">&rarr;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Sneak (sneak.js): creep past the guards' lanterns, take every gem and slip out of the door -->
+    <article class="sneak" data-sneak hidden>
+      <div class="bench sneak__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">sneak.js</span>
+          <div class="bench__engines sneak__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="normal" aria-pressed="true">Normal</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="sneak__body">
+          <div class="sneak__stage" data-stage tabindex="0" aria-label="Sneak">
+            <canvas class="sneak__board" data-board width="480" height="312" aria-hidden="true"></canvas>
+            <div class="tetris__overlay sneak__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Take every gem and reach the door without stepping into the light.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sneak__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Level</span>
+              <span class="bench__value" data-out="level">1 / 5</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Loot</span>
+              <span class="bench__value" data-out="loot">0 / 2</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">0:00</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Caught</span>
+              <span class="bench__value" data-out="caught">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&uarr;</kbd><kbd>&darr;</kbd></dt><dd>Creep</dd></div>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Creep</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="sneak__hint">W A S D work too. Walls and crates block the lanterns; the dark patches hide you.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); holding a finger on the board pushes the thief that way too -->
+          <div class="tetris__pad sneak__pad">
+            <button type="button" data-dir="up" aria-label="Creep up">&uarr;</button>
+            <button type="button" data-dir="left" aria-label="Creep left">&larr;</button>
+            <button type="button" data-dir="down" aria-label="Creep down">&darr;</button>
+            <button type="button" data-dir="right" aria-label="Creep right">&rarr;</button>
+            <button type="button" class="sneak__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Climb (climb.js): jump from ledge to ledge up a tower shaft, ahead of the rising lava -->
+    <article class="climb" data-climb hidden>
+      <div class="bench climb__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">climb.js</span>
+          <div class="bench__engines climb__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="normal" aria-pressed="true">Normal</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="climb__body">
+          <div class="climb__stage" data-stage tabindex="0" aria-label="Climb">
+            <canvas class="climb__tower" data-tower width="320" height="480" aria-hidden="true"></canvas>
+            <div class="tetris__overlay climb__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Jump from ledge to ledge. The lava is coming up behind you.</p>
+                <button class="btn btn--primary" type="button" data-start>Start climbing</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="climb__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Height</span>
+              <span class="bench__value" data-out="height">0 m</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Climbs</span>
+              <span class="bench__value" data-out="runs">0</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Run</dd></div>
+                <div><dt><kbd>&uarr;</kbd><kbd>Space</kbd></dt><dd>Jump</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="climb__hint">A D and W work too. Let go of jump early for a shorter hop. Cracked ledges crumble; blue ones slide.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); tapping the tower jumps too -->
+          <div class="tetris__pad climb__pad">
+            <button type="button" data-dir="left" aria-label="Run left">&larr;</button>
+            <button type="button" data-act="jump" aria-label="Jump">Jump</button>
+            <button type="button" data-dir="right" aria-label="Run right">&rarr;</button>
+            <button type="button" class="climb__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Block Breaker (breaker.js): bounce the ball off the paddle and knock every brick out of the board -->
+    <article class="breaker" data-breaker hidden>
+      <div class="bench breaker__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">breaker.js</span>
+          <div class="bench__engines breaker__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="normal" aria-pressed="true">Normal</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="breaker__body">
+          <div class="breaker__stage" data-stage tabindex="0" aria-label="Block Breaker">
+            <canvas class="breaker__board" data-board width="360" height="480" aria-hidden="true"></canvas>
+            <div class="tetris__overlay breaker__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Knock out every brick. Where the ball lands on the paddle sets its angle.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="breaker__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Score</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Level</span>
+              <span class="bench__value" data-out="level">1</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Balls</span>
+              <span class="bench__value" data-out="lives">3</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>Space</kbd><kbd>&uarr;</kbd></dt><dd>Launch</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="breaker__hint">A and D work too, or steer with the mouse. Capsules: W widens the paddle, S slows the ball, M splits it in three, &hearts; is one more ball.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens); dragging on the board steers and tapping launches too -->
+          <div class="tetris__pad breaker__pad">
+            <button type="button" data-dir="left" aria-label="Move left">&larr;</button>
+            <button type="button" data-act="launch" aria-label="Launch">Launch</button>
+            <button type="button" data-dir="right" aria-label="Move right">&rarr;</button>
+            <button type="button" class="breaker__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Zero (zero.js): a Mega Man-style side-scrolling stage; Zero runs, dashes, wall-kicks and swings the Z-Saber to the mech at the end -->
+    <article class="zero" data-zero hidden>
+      <div class="bench zero__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">zero.js</span>
+          <span class="zero__mission">Mission: the gate at the end of the highway</span>
+        </div>
+        <div class="zero__body">
+          <div class="zero__stage" data-stage tabindex="0" aria-label="Zero">
+            <canvas class="zero__screen" data-screen width="320" height="240" aria-hidden="true"></canvas>
+            <div class="tetris__overlay zero__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Run right, cut down the Mavericks and scrap the mech behind the gate.</p>
+                <button class="btn btn--primary" type="button" data-start>Start mission</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="zero__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Score</span>
+              <span class="bench__value" data-out="score">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Lives</span>
+              <span class="bench__value" data-out="lives">3</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">0:00</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Run</dd></div>
+                <div><dt><kbd>X</kbd><kbd>&uarr;</kbd></dt><dd>Jump</dd></div>
+                <div><dt><kbd>Z</kbd></dt><dd>Z-Saber</dd></div>
+                <div><dt><kbd>C</kbd><kbd>Shift</kbd></dt><dd>Dash</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="zero__hint">A D and W work too. Jump into a wall to slide down it, then jump again to kick off. Jump mid-dash to carry the speed. The saber cuts shots out of the air.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens) -->
+          <div class="tetris__pad zero__pad">
+            <button type="button" data-dir="left" aria-label="Run left">&larr;</button>
+            <button type="button" data-dir="right" aria-label="Run right">&rarr;</button>
+            <button type="button" data-act="dash" aria-label="Dash">&raquo;</button>
+            <button type="button" data-act="slash" aria-label="Z-Saber">&#9876;</button>
+            <button type="button" data-act="jump" aria-label="Jump">&#10514;</button>
+            <button type="button" class="zero__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Race (race.js): an OutRun-style road racer, three laps against five rivals through the traffic -->
+    <article class="race" data-race hidden>
+      <div class="bench race__card">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">race.js</span>
+          <div class="bench__engines race__modes" role="group" aria-label="Difficulty">
+            <button class="bench__engine is-active" type="button" data-mode="normal" aria-pressed="true">Normal</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="race__body">
+          <div class="race__stage" data-stage tabindex="0" aria-label="Race">
+            <canvas class="race__track" data-track width="400" height="300" aria-hidden="true"></canvas>
+            <div class="tetris__overlay race__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Three laps against five rivals. Hold &uarr; to go, steer with &larr; and &rarr;.</p>
+                <button class="btn btn--primary" type="button" data-start>Start race</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="race__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">0:00.0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Lap</span>
+              <span class="bench__value" data-out="lap">1 / 3</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Place</span>
+              <span class="bench__value" data-out="place">1st</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Speed</span>
+              <span class="bench__value" data-out="speed">0 km/h</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&uarr;</kbd></dt><dd>Accelerate</dd></div>
+                <div><dt><kbd>&darr;</kbd></dt><dd>Brake</dd></div>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Steer</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+              <p class="race__hint">W, A, S and D work too. The bends push you outwards; off the road or into a car and the speed is gone.</p>
+            </div>
+          </div>
+
+          <!-- Touch controls (shown on touch screens): hold the arrows to steer, GO to accelerate, the brake to slow -->
+          <div class="tetris__pad race__pad">
+            <button type="button" data-dir="left" aria-label="Steer left">&larr;</button>
+            <button type="button" data-act="brake" aria-label="Brake">Brake</button>
+            <button type="button" data-act="gas" aria-label="Accelerate">GO</button>
+            <button type="button" data-dir="right" aria-label="Steer right">&rarr;</button>
+            <button type="button" class="race__pad-pause" data-act="pause" aria-label="Pause">&#10074;&#10074;</button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Memory (memory.js): pairs of monsters face down; turn two at a time and find every pair -->
+    <article class="memory" data-memory hidden>
+      <div class="bench memory__card-window">
+        <div class="bench__bar">
+          <span class="bench__dots"><button class="bench__exit" type="button" data-exit aria-label="Exit to the dungeon" title="Exit to the dungeon"></button><i></i><i></i></span>
+          <span class="bench__name">memory.js</span>
+          <div class="bench__engines memory__modes" role="group" aria-label="Board size">
+            <button class="bench__engine is-active" type="button" data-mode="easy" aria-pressed="true">Easy</button>
+            <button class="bench__engine" type="button" data-mode="medium" aria-pressed="false">Medium</button>
+            <button class="bench__engine" type="button" data-mode="hard" aria-pressed="false">Hard</button>
+          </div>
+        </div>
+        <div class="memory__body">
+          <div class="memory__stage" data-stage tabindex="0" aria-label="Memory board">
+            <div class="memory__board" data-board></div>
+            <div class="tetris__overlay memory__overlay" data-overlay>
+              <div class="tetris__dialog">
+                <p data-msg aria-live="polite">Twelve cards, six monsters. Find every pair.</p>
+                <button class="btn btn--primary" type="button" data-start>Start game</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="memory__side">
+            <div class="bench__stat bench__stat--main">
+              <span class="bench__label">Pairs</span>
+              <span class="bench__value" data-out="pairs">0 / 6</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Moves</span>
+              <span class="bench__value" data-out="moves">0</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Time</span>
+              <span class="bench__value" data-out="time">0:00</span>
+            </div>
+            <div class="bench__stat">
+              <span class="bench__label">Best</span>
+              <span class="bench__value" data-out="best">-</span>
+            </div>
+            <div class="bench__stat tetris__keys">
+              <span class="bench__label">Keys</span>
+              <dl>
+                <div><dt><kbd>&uarr;</kbd><kbd>&darr;</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>&larr;</kbd><kbd>&rarr;</kbd></dt><dd>Move</dd></div>
+                <div><dt><kbd>Z</kbd></dt><dd>Turn over</dd></div>
+                <div><dt><kbd>P</kbd></dt><dd>Pause</dd></div>
+              </dl>
+            </div>
+            <div class="bench__stat memory__help">
+              <span class="bench__label">How to play</span>
+              <p>Turn over two cards. A matching pair stays up; anything else turns back over.</p>
+              <p>Click or tap a card, or move with the arrows and press Z. The clock starts on your first card.</p>
+              <p>Clear the board and one of its monsters joins your collection.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- Music (music.js), bottom left: off until switched on; the jukebox in the lobby picks the track -->
+  <div class="play__music" data-music="assets/music">
+    <button class="play__music-btn" type="button" data-toggle aria-pressed="false">
+      <span class="play__music-icon" aria-hidden="true">&#9835;</span><span data-label>Music off</span>
+    </button>
+    <label class="play__music-vol">
+      <span class="visually-hidden">Volume</span>
+      <input type="range" min="0" max="100" value="50" data-volume />
+    </label>
+  </div>
+  <p class="play__issue"><a href="https://github.com/khanhnd61-vr/arcade/issues/new" target="_blank" rel="noopener">Issue or feedback here &#8599;</a></p>
+
+  <script src="tetris.js"></script>
+  <script src="hashi.js"></script>
+  <script src="balatro.js"></script>
+  <script src="pong.js"></script>
+  <script src="pikachu.js"></script>
+  <script src="flappy.js"></script>
+  <script src="minesweeper.js"></script>
+  <script src="snake.js"></script>
+  <script src="bomberman.js"></script>
+  <script src="missiles.js"></script>
+  <script src="sneak.js"></script>
+  <script src="climb.js"></script>
+  <script src="breaker.js"></script>
+  <script src="zero.js"></script>
+  <script src="race.js"></script>
+  <script src="monsters.js"></script>
+  <script src="memory.js"></script>
+  <script src="dungeon.js"></script>
+  <script src="music.js"></script>
+  <!-- Accounts (account.js): Google sign-in and a cloud copy of the progress, loaded as a module from Firebase's CDN -->
+  <script type="module" src="account.js"></script>
+</body>
+</html>

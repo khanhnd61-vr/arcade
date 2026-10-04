@@ -1,0 +1,35 @@
+rules_version = '2';
+// Who may read and write what in Firestore. Deployed with
+// `firebase deploy --only firestore:rules`, or pasted into the console's Rules
+// tab; the console copy is the one that counts, so keep the two the same.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // One document per player, at players/{uid}, holding a flat map of the
+    // arcade's own local-storage keys (see account.js). Only that player may
+    // touch it, and only with those keys. Everything else is closed.
+    match /players/{uid} {
+      allow read, delete: if signedInAs(uid);
+      allow create, update: if signedInAs(uid) && okSave(request.resource.data);
+    }
+
+    function signedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function okSave(d) {
+      return d.keys().hasOnly(['bests', 'updatedAt'])
+        && d.updatedAt == request.time
+        && d.bests is map
+        && d.bests.keys().hasOnly([
+          'pong-best-rally-1', 'pong-best-rally-2', 'balatro-best', 'tetris-best',
+          'hashi-best', 'pika-best', 'flappy-best-normal', 'flappy-best-hard',
+          'missiles-best-normal', 'missiles-best-fast', 'missiles-stars', 'mines-best',
+          'snake-best-easy', 'snake-best-medium', 'snake-best-hard',
+          'sneak-best-normal', 'sneak-best-hard', 'climb-best-normal', 'climb-best-hard',
+          'zero-best', 'bomber-best-easy', 'bomber-best-medium', 'bomber-best-hard',
+          'breaker-best-normal', 'breaker-best-hard', 'race-best', 'memory-best', 'arcade-mons',
+          'arcade-party', 'arcade-walk'
+        ]);
+    }
+  }
+}
