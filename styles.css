@@ -837,7 +837,16 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; font-weight: 6
 
 /* Feedback line under whichever game window is showing */
 .play__issue { position: fixed; right: 16px; bottom: 22px; z-index: 20; margin: 0; font-size: .82rem; color: var(--ink-soft); }
-/* Havilab, top right: a pill like the music control, leading to the maker's site */
+/* The maker's note, bottom centre in the strip the window leaves free, level with the feedback line */
+.play__quote {
+  position: fixed; left: 50%; bottom: 22px; z-index: 20; margin: 0; transform: translateX(-50%);
+  white-space: nowrap; font: italic 500 .82rem var(--font-body); color: var(--ink-soft);
+}
+/* Below 1040px that strip is too narrow between the music and feedback corners: the note goes above the window */
+@media (max-width: 1040px) {
+  .play__quote { position: static; transform: none; white-space: normal; margin: 16px 16px 0; text-align: center; }
+}
+/* Home, top right: a pill like the music control, leading to the maker's site */
 .play__havi {
   position: fixed; top: 16px; right: 16px; z-index: 20; display: inline-flex; align-items: center; padding: 10px 18px;
   background: #fffaf2; border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--shadow);
@@ -846,7 +855,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; font-weight: 6
 .play__havi:hover { color: var(--primary); }
 .play__havi:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
 /* Narrow screens: the issue line goes under the window instead of fighting the music control for the corner,
-   and the Havilab pill sits above it rather than over its title bar */
+   and the note and the Home pill sit above it rather than over its title bar */
 @media (max-width: 760px) {
   .play__issue { position: static; margin: 14px 0 0; text-align: center; }
   .play__havi { position: static; display: table; margin: 16px auto -4px; }
